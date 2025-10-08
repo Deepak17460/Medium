@@ -1,0 +1,184 @@
+const initSqlJs = require('sql.js');
+const fs = require('fs');
+const path = require('path');
+
+const dbPath = path.join(__dirname, '..', 'blog.db');
+let db = null;
+
+// Initialize SQL.js database
+async function initializeDatabase() {
+  console.log('📊 Initializing database...');
+  
+  try {
+    const SQL = await initSqlJs();
+    
+    // Load existing database or create new one
+    if (fs.existsSync(dbPath)) {
+      const buffer = fs.readFileSync(dbPath);
+      db = new SQL.Database(buffer);
+      console.log('✅ Loaded existing database');
+    } else {
+      db = new SQL.Database();
+      console.log('✅ Created new database');
+    }
+    
+    // Create users table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        name TEXT NOT NULL,
+        avatar TEXT,
+        bio TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_user_email ON users(email);`);
+    
+    // Create posts table (updated with user_id)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id TEXT PRIMARY KEY,
+        slug TEXT UNIQUE NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        excerpt TEXT,
+        author TEXT NOT NULL,
+        user_id TEXT,
+        category TEXT,
+        cover_image TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        read_time INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_slug ON posts(slug);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_category ON posts(category);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_created_at ON posts(created_at DESC);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_user_id ON posts(user_id);`);
+    
+    // Create tags table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL
+      );
+    `);
+    
+    // Create post_tags junction table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS post_tags (
+        post_id TEXT NOT NULL,
+        tag_id INTEGER NOT NULL,
+        PRIMARY KEY (post_id, tag_id),
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+        FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_post_tags_post ON post_tags(post_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);`);
+    
+    // Create likes table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS likes (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        post_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(user_id, post_id),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_likes_user ON likes(user_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_likes_post ON likes(post_id);`);
+    
+    // Create comments table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS comments (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        post_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_comments_user ON comments(user_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_id);`);
+    
+    // Create follows table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS follows (
+        id TEXT PRIMARY KEY,
+        follower_id TEXT NOT NULL,
+        following_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(follower_id, following_id),
+        FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id);`);
+    
+    // Create bookmarks table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS bookmarks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        post_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(user_id, post_id),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_bookmarks_user ON bookmarks(user_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_bookmarks_post ON bookmarks(post_id);`);
+    
+    // Save database to disk
+    saveDatabase();
+    
+    console.log('✅ Database initialized successfully');
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    throw error;
+  }
+}
+
+// Save database to disk
+function saveDatabase() {
+  if (db) {
+    const data = db.export();
+    const buffer = Buffer.from(data);
+    fs.writeFileSync(dbPath, buffer);
+  }
+}
+
+// Get database instance
+function getDB() {
+  if (!db) {
+    throw new Error('Database not initialized. Call initializeDatabase() first.');
+  }
+  return db;
+}
+
+// Export functions
+module.exports = {
+  initializeDatabase,
+  getDB,
+  saveDatabase,
+};
