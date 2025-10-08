@@ -121,9 +121,20 @@ exports.getMe = (req, res) => {
 // @access  Private
 exports.updateProfile = async (req, res, next) => {
   try {
-    const { name, bio, avatar } = req.body;
+    const { name, email, bio, avatar } = req.body;
 
-    const updatedUser = await User.update(req.user.id, { name, bio, avatar });
+    // Check if email is being changed and if it's already taken
+    if (email && email !== req.user.email) {
+      const existingUser = User.findByEmail(email);
+      if (existingUser && existingUser.id !== req.user.id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already in use',
+        });
+      }
+    }
+
+    const updatedUser = await User.update(req.user.id, { name, email, bio, avatar });
     const safeUser = User.getSafeUser(updatedUser);
 
     res.json({

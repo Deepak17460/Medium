@@ -1,523 +1,348 @@
-# TechBlog - React.js + Node.js (MVC Architecture)
+# TechBlog - A Professional Blogging Platform
 
-A professional blogging platform with **React.js frontend** and **Node.js Express backend** following **MVC (Model-View-Controller)** architecture. Fully containerized with **Docker** and **Docker Compose**.
+A full-featured blogging platform built with React.js, Node.js, Express, and SQLite, inspired by Medium's design and functionality.
 
-![React.js](https://img.shields.io/badge/React-18-61DAFB) ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933) ![Express](https://img.shields.io/badge/Express-4-000000) ![MVC](https://img.shields.io/badge/Architecture-MVC-orange) ![SQLite](https://img.shields.io/badge/SQLite-3-003B57) ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
+## 🚀 Features
 
----
+### Real-Time Features
+- **User Authentication**: JWT-based secure authentication with login/signup
+- **Real-time Likes**: Like and unlike posts with instant count updates
+- **Real-time Comments**: Add, view, and delete comments on posts
+- **Live Search**: Search posts by title, content, author, tags, and categories
+- **Follow System**: Follow/unfollow users and see follower/following counts
+- **Bookmark System**: Bookmark posts for later reading
+- **Featured Posts**: Feature/unfeature posts with star icon (real-time toggle)
+- **User Profiles**: View user profiles with post counts and activity
+- **Dynamic Content**: All data is fetched from the database in real-time
 
-## ✨ Features
+### User Management
+- Secure user registration and login
+- JWT authentication with HTTP-only cookies
+- Profile management with bio and avatar support
+- Password encryption with bcryptjs
+- Persistent sessions
 
-- 📝 **Rich Text Editor** - WYSIWYG editor with React Quill
-- 🗄️ **SQLite Database** - Lightweight, serverless database
-- 🎨 **Medium-like UI** - Professional, clean design
-- 🏗️ **MVC Architecture** - Professional backend structure
-- 🐳 **Docker Support** - Fully containerized application
-- 🔌 **RESTful API** - Clean, organized routes
-- 🏷️ **Categories & Tags** - Organize posts by topics
-- 📱 **Fully Responsive** - Works on all devices
-- ⚡ **Fast Performance** - Optimized React frontend
+### Content Creation
+- Rich text editor (React Quill) for creating posts
+- Cover image support (file system selection)
+- Automatic slug generation
+- Tags and categories
+- Automatic read time calculation
+- Post excerpts
+- Draft and publish workflow
 
----
+### Social Features
+- Like/unlike posts
+- Comment on posts
+- Reply to comments
+- Follow/unfollow authors
+- Bookmark posts
+- Feature/unfeature posts (star icon)
+- View follower and following lists
+- User activity tracking
 
-## 🐳 Docker Deployment (Recommended)
+### UI/UX
+- Medium-inspired clean design
+- Responsive layout
+- Collapsible sidebar navigation
+- Real-time search with instant results
+- Loading states and error handling
+- Smooth animations and transitions
 
-### Quick Start with Docker Compose
-
-```bash
-# 1. Build and start all services
-docker-compose up -d
-
-# 2. Access the application
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:5000
-```
-
-### Available Docker Commands
-
-```bash
-# Start services
-docker-compose up -d
-
-# Start with logs
-docker-compose up
-
-# Stop services
-docker-compose down
-
-# Rebuild images
-docker-compose build
-
-# View logs
-docker-compose logs -f
-
-# Stop and remove volumes
-docker-compose down -v
-```
-
-### Development Mode with Docker
-
-```bash
-# Start in development mode (with hot reload)
-docker-compose -f docker-compose.dev.yml up
-
-# Stop development services
-docker-compose -f docker-compose.dev.yml down
-```
-
----
-
-## 🏗️ Professional Backend Structure (MVC)
-
-```
-backend/
-├── models/                      # Data Models
-│   └── Post.js                  # Post model
-├── controllers/                 # Business Logic
-│   └── postController.js        # Request handlers
-├── routes/                      # API Routes
-│   ├── index.js                 # Main router
-│   ├── postRoutes.js            # Post routes
-│   └── categoryRoutes.js        # Category routes
-├── config/                      # Configuration
-│   └── database.js              # Database setup
-├── middleware/                  # Middleware
-│   └── errorHandler.js          # Error handling
-├── scripts/                     # Utility Scripts
-│   └── seed.js                  # Database seeder
-├── Dockerfile                   # Production Docker image
-├── Dockerfile.dev               # Development Docker image
-└── server.js                    # Entry point
-```
-
----
-
-## 📁 Complete Project Structure
+## 📁 Project Structure
 
 ```
 Blogging/
-├── frontend/                    # React.js Frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── api/
-│   ├── public/
-│   ├── Dockerfile               # Production
-│   ├── Dockerfile.dev           # Development
-│   ├── nginx.conf               # Nginx config
-│   └── package.json
-│
-├── backend/                     # Node.js Backend (MVC)
-│   ├── models/
-│   ├── controllers/
-│   ├── routes/
+├── backend/                    # Node.js + Express backend
 │   ├── config/
+│   │   └── database.js        # SQLite database configuration
+│   ├── controllers/           # Business logic
+│   │   ├── authController.js  # Authentication logic
+│   │   ├── postController.js  # Post CRUD operations
+│   │   ├── likeController.js  # Like management
+│   │   ├── commentController.js
+│   │   ├── followController.js
+│   │   ├── bookmarkController.js
+│   │   └── userController.js
+│   ├── models/                # Database models
+│   │   ├── User.js
+│   │   ├── Post.js
+│   │   ├── Like.js
+│   │   ├── Comment.js
+│   │   ├── Follow.js
+│   │   └── Bookmark.js
+│   ├── routes/                # API routes
+│   │   ├── index.js           # Main router
+│   │   ├── authRoutes.js
+│   │   ├── postRoutes.js
+│   │   ├── likeRoutes.js
+│   │   ├── commentRoutes.js
+│   │   ├── userRoutes.js
+│   │   └── bookmarkRoutes.js
 │   ├── middleware/
+│   │   ├── auth.js            # JWT authentication middleware
+│   │   └── errorHandler.js   # Global error handler
 │   ├── scripts/
-│   ├── Dockerfile               # Production
-│   ├── Dockerfile.dev           # Development
-│   └── server.js
+│   │   └── seed.js            # Database seeding script
+│   ├── server.js              # Express app entry point
+│   ├── package.json
+│   └── Dockerfile
 │
-├── docker-compose.yml           # Production compose
-├── docker-compose.dev.yml       # Development compose
-├── package.json                 # Root scripts
+├── frontend/                  # React.js frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── api/
+│   │   │   └── api.js         # Axios API client
+│   │   ├── components/
+│   │   │   ├── Header.js      # Navigation header
+│   │   │   ├── Sidebar.js     # Left sidebar
+│   │   │   ├── RightSidebar.js
+│   │   │   ├── BlogCard.js
+│   │   │   ├── AuthModal.js
+│   │   │   └── RichTextEditor.js
+│   │   ├── context/
+│   │   │   └── AuthContext.js # Authentication context
+│   │   ├── pages/
+│   │   │   ├── Landing.js     # Landing page with trending posts
+│   │   │   ├── Home.js        # Main feed
+│   │   │   ├── CreatePost.js  # Post creation
+│   │   │   ├── EditPost.js    # Post editing
+│   │   │   ├── ViewPost.js    # Post view with comments
+│   │   │   ├── Stories.js     # User's own posts
+│   │   │   ├── Profile.js     # User profile
+│   │   │   ├── Followers.js
+│   │   │   └── Following.js
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   └── Dockerfile
+│
+├── docker-compose.yml         # Docker orchestration
 └── README.md
 ```
 
----
-
-## 🚀 Local Development (Without Docker)
-
-### Installation
-
-```bash
-# Install all dependencies (Windows PowerShell)
-npm install
-cd frontend
-npm install
-cd ..
-cd backend
-npm install
-cd ..
-
-# OR (Linux/Mac)
-npm run install:all
-```
-
-### Seed Database with Test Data
-
-```bash
-# Windows PowerShell
-cd backend
-npm run seed
-cd ..
-
-# OR (Linux/Mac)
-npm run seed
-```
-
-**Test User Accounts** (all passwords: `password123`):
-- `john@example.com` - John Doe
-- `sarah@example.com` - Sarah Johnson
-- `mike@example.com` - Mike Chen
-- `emma@example.com` - Emma Wilson
-
-### Run Application
-
-Open **TWO terminals**:
-
-**Terminal 1 - Backend:**
-```powershell
-# Windows PowerShell
-cd backend
-npm run dev
-
-# Backend will run on http://localhost:5000
-```
-
-**Terminal 2 - Frontend:**
-```powershell
-# Windows PowerShell
-cd frontend
-npm start
-
-# Frontend will run on http://localhost:3000
-```
-
----
-
-## 🐳 Docker Architecture
-
-### Services
-
-**Backend Service:**
-- Container: `techblog-backend`
-- Port: `5000`
-- Base Image: `node:18-alpine`
-- Features: Health check, volume persistence
-
-**Frontend Service:**
-- Container: `techblog-frontend`
-- Port: `3000` (mapped to internal 80)
-- Base Image: `nginx:alpine`
-- Features: Multi-stage build, reverse proxy
-
-### Networking
-
-- Bridge network: `techblog-network`
-- Frontend can communicate with backend via service name
-- API proxied through Nginx
-
-### Volumes
-
-- `backend-data`: Persists SQLite database
-- Database mounted at `/app/blog.db`
-
----
-
-## 🔌 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check |
-| GET | `/api/posts` | Get all posts |
-| POST | `/api/posts` | Create post |
-| GET | `/api/posts/:id` | Get post by ID |
-| GET | `/api/posts/slug/:slug` | Get post by slug |
-| PUT | `/api/posts/:id` | Update post |
-| DELETE | `/api/posts/:id` | Delete post |
-| GET | `/api/categories` | Get categories |
-| GET | `/api/tags` | Get tags |
-
----
-
-## 📝 NPM Scripts
-
-### Root Level
-
-```bash
-npm run install:all      # Install all dependencies
-npm run dev:backend      # Run backend with nodemon
-npm run dev:frontend     # Run frontend dev server
-npm run seed             # Seed database
-```
+## 🛠️ Tech Stack
 
 ### Backend
-
-```bash
-npm start        # Production server
-npm run dev      # Development with nodemon
-npm run seed     # Seed database
-```
-
-### Frontend
-
-```bash
-npm start        # Development server
-npm run build    # Production build
-npm test         # Run tests
-```
-
----
-
-## 🐳 Docker Best Practices
-
-### Production Images
-
-✅ Multi-stage builds (frontend)  
-✅ Alpine Linux for smaller images  
-✅ Health checks configured  
-✅ Security headers in Nginx  
-✅ Production-only dependencies  
-✅ .dockerignore for faster builds  
-
-### Development Images
-
-✅ Hot reload support  
-✅ Volume mounting for code  
-✅ All dev dependencies included  
-✅ Faster build times  
-
----
-
-## 🚀 Deployment Options
-
-### 1. Docker Compose (Easiest)
-
-```bash
-# On your server
-git clone <repository>
-cd Blogging
-docker-compose up -d
-```
-
-### 2. Docker Hub
-
-```bash
-# Build and push images
-docker build -t yourusername/techblog-backend:latest ./backend
-docker build -t yourusername/techblog-frontend:latest ./frontend
-
-docker push yourusername/techblog-backend:latest
-docker push yourusername/techblog-frontend:latest
-
-# Pull and run on server
-docker-compose pull
-docker-compose up -d
-```
-
-### 3. Container Platforms
-
-Deploy to:
-- **Docker Swarm** - Container orchestration
-- **Kubernetes** - Enterprise orchestration
-- **AWS ECS** - Amazon container service
-- **Google Cloud Run** - Serverless containers
-- **Azure Container Instances** - Microsoft containers
-- **Railway** - Simple deployment
-- **Render** - Easy Docker hosting
-
----
-
-## 🔧 Environment Variables
-
-### Backend (.env)
-
-```env
-NODE_ENV=production
-PORT=5000
-```
-
-### Frontend (.env)
-
-```env
-REACT_APP_API_URL=http://localhost:5000/api
-```
-
-### Docker Compose Override
-
-Create `docker-compose.override.yml`:
-
-```yaml
-version: '3.8'
-services:
-  backend:
-    environment:
-      - PORT=8080
-    ports:
-      - "8080:8080"
-```
-
----
-
-## 📊 Docker Commands Cheat Sheet
-
-```bash
-# Build specific service
-docker-compose build backend
-
-# Restart a service
-docker-compose restart frontend
-
-# View service logs
-docker-compose logs backend -f
-
-# Execute command in container
-docker-compose exec backend npm run seed
-
-# Scale service (if needed)
-docker-compose up -d --scale backend=2
-
-# Remove everything (including volumes)
-docker-compose down -v --remove-orphans
-
-# Prune unused Docker resources
-docker system prune -a
-```
-
----
-
-## 🔍 Troubleshooting
-
-### Port Already in Use
-
-```bash
-# Change ports in docker-compose.yml
-ports:
-  - "3001:80"  # Frontend
-  - "5001:5000"  # Backend
-```
-
-### Rebuild After Code Changes
-
-```bash
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-### Database Issues
-
-```bash
-# Reset database
-docker-compose down -v
-docker-compose up -d
-docker-compose exec backend npm run seed
-```
-
-### View Container Status
-
-```bash
-docker-compose ps
-docker-compose logs
-```
-
----
-
-## 🎯 Benefits of Docker
-
-### ✅ Consistency
-- Same environment everywhere
-- No "works on my machine" issues
-- Easy onboarding for new developers
-
-### ✅ Isolation
-- Each service in its own container
-- No dependency conflicts
-- Clean system
-
-### ✅ Scalability
-- Easy to scale services
-- Load balancing ready
-- Microservices-ready architecture
-
-### ✅ Portability
-- Run anywhere Docker is installed
-- Cloud-agnostic deployment
-- Easy migration between environments
-
----
-
-## 🛠️ Technology Stack
+- **Node.js** - JavaScript runtime
+- **Express.js** - Web framework
+- **SQLite (sql.js)** - Lightweight database
+- **bcryptjs** - Password hashing
+- **jsonwebtoken** - JWT authentication
+- **cookie-parser** - Cookie handling
+- **slugify** - URL slug generation
 
 ### Frontend
-- **React** 18.2
-- **React Router DOM** 6
-- **React Quill** - Rich text editor
+- **React.js** - UI framework
+- **React Router** - Client-side routing
 - **Axios** - HTTP client
-- **Tailwind CSS** - Styling
-- **Nginx** - Production server
-
-### Backend
-- **Node.js** 18
-- **Express** 4
-- **sql.js** - SQLite implementation
-- **slugify** - URL slugs
-- **cors** - CORS handling
+- **React Quill** - Rich text editor
+- **date-fns** - Date formatting
+- **Tailwind CSS** - Utility-first CSS
 
 ### DevOps
 - **Docker** - Containerization
-- **Docker Compose** - Orchestration
-- **Nginx** - Reverse proxy
-- **Alpine Linux** - Base images
+- **Docker Compose** - Multi-container orchestration
+- **Nginx** - Static file serving (frontend)
+
+## 📦 Installation
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Docker and Docker Compose (optional)
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```powershell
+   git clone <repository-url>
+   cd Blogging
+   ```
+
+2. **Backend Setup**
+   ```powershell
+   cd backend
+   npm install
+   
+   # Seed the database with sample data
+   node scripts/seed.js
+   
+   # Start the backend server
+   npm start
+   # or for development with auto-reload
+   npm run dev
+   ```
+   
+   Backend will run on `http://localhost:5000`
+
+3. **Frontend Setup**
+   ```powershell
+   cd frontend
+   npm install
+   
+   # Start the development server
+   npm start
+   ```
+   
+   Frontend will run on `http://localhost:3000`
+
+### Docker Setup
+
+1. **Build and run with Docker Compose**
+   ```powershell
+   docker-compose up --build
+   ```
+
+2. **Access the application**
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:5000`
+
+## 🔑 Test Accounts
+
+After seeding the database, you can use these test accounts:
+
+- **Email**: `john@example.com` | **Password**: `password123`
+- **Email**: `sarah@example.com` | **Password**: `password123`
+- **Email**: `mike@example.com` | **Password**: `password123`
+- **Email**: `emma@example.com` | **Password**: `password123`
+
+## 🔌 API Endpoints
+
+### Authentication
+- `POST /api/auth/signup` - Register a new user
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/logout` - Logout user
+- `GET /api/auth/me` - Get current user
+- `PUT /api/auth/profile` - Update user profile
+- `PUT /api/auth/password` - Update password
+
+### Posts
+- `GET /api/posts` - Get all posts (with optional filters)
+- `GET /api/posts/:id` - Get post by ID
+- `GET /api/posts/slug/:slug` - Get post by slug
+- `POST /api/posts` - Create new post (protected)
+- `PUT /api/posts/:id` - Update post (protected)
+- `DELETE /api/posts/:id` - Delete post (protected)
+
+### Likes
+- `GET /api/posts/:postId/likes` - Get post likes
+- `POST /api/posts/:postId/like` - Like a post (protected)
+- `DELETE /api/posts/:postId/like` - Unlike a post (protected)
+
+### Comments
+- `GET /api/posts/:postId/comments` - Get post comments
+- `POST /api/posts/:postId/comments` - Create comment (protected)
+- `PUT /api/posts/comments/:id` - Update comment (protected)
+- `DELETE /api/posts/comments/:id` - Delete comment (protected)
+
+### Users
+- `GET /api/users/:userId` - Get user profile
+- `GET /api/users/:userId/posts` - Get user posts
+- `POST /api/users/:userId/follow` - Follow user (protected)
+- `DELETE /api/users/:userId/follow` - Unfollow user (protected)
+- `GET /api/users/:userId/followers` - Get user followers
+- `GET /api/users/:userId/following` - Get users being followed
+- `GET /api/users/:userId/is-following` - Check if following (protected)
+
+### Bookmarks
+- `POST /api/posts/:postId/bookmark` - Bookmark post (protected)
+- `DELETE /api/posts/:postId/bookmark` - Remove bookmark (protected)
+- `GET /api/posts/bookmarks` - Get user bookmarks (protected)
+- `GET /api/posts/:postId/bookmark/check` - Check if bookmarked (protected)
+
+### Categories & Tags
+- `GET /api/categories` - Get all categories
+- `GET /api/tags` - Get all tags
+
+## 🎨 Key Features Explained
+
+### Authentication Flow
+1. Users sign up with email, name, and password
+2. Password is hashed using bcryptjs
+3. JWT token is generated and sent as HTTP-only cookie
+4. Frontend stores token in localStorage and includes it in API requests
+5. Protected routes verify token using middleware
+
+### Real-Time Interactions
+- **Likes**: Click the heart icon to like/unlike posts; count updates immediately
+- **Comments**: Submit comments and see them appear instantly
+- **Follow**: Follow users and see updated follower counts in real-time
+- **Bookmarks**: Save posts for later and access them from your profile
+- **Search**: Type in the header search bar for instant filtered results
+
+### Content Management
+- **Create**: Use the rich text editor with formatting options
+- **Edit**: Update your own posts from the Stories page
+- **Delete**: Remove posts you've created
+- **Cover Images**: Select images from your file system
+
+### User Profiles
+- View any user's profile by clicking their name or avatar
+- See their post count, followers, and following
+- View all posts by that user
+- Follow/unfollow from their profile
+
+## 🔒 Security Features
+
+- Password hashing with bcryptjs
+- JWT-based authentication
+- HTTP-only cookies for token storage
+- Protected API routes
+- Input validation
+- SQL injection prevention (parameterized queries)
+- CORS configuration
+
+## 🚦 Running in Production
+
+1. Set environment variables:
+   ```
+   NODE_ENV=production
+   JWT_SECRET=your-secret-key
+   REACT_APP_API_URL=https://your-api-domain.com/api
+   ```
+
+2. Build frontend:
+   ```powershell
+   cd frontend
+   npm run build
+   ```
+
+3. Serve frontend static files with Nginx or similar
+
+4. Run backend with PM2 or similar process manager
+
+## 🐛 Troubleshooting
+
+### Backend Issues
+- **Port already in use**: Kill existing Node processes or change port
+  ```powershell
+  taskkill /F /IM node.exe
+  ```
+- **Database locked**: Make sure only one instance of the backend is running
+- **Module not found**: Run `npm install` in the backend directory
+
+### Frontend Issues
+- **API connection failed**: Ensure backend is running on port 5000
+- **Authentication errors**: Clear localStorage and cookies, then re-login
+- **Build errors**: Delete `node_modules` and run `npm install` again
+
+## 📝 Development Notes
+
+- The database file (`blog.db`) is created automatically on first run
+- To reset the database, delete `blog.db` and run `node scripts/seed.js`
+- The seed script creates sample users, posts, likes, and comments
+- All dates are stored in ISO format and formatted on the frontend
+- Images are stored as base64 or data URLs (consider cloud storage for production)
+
+## 🤝 Contributing
+
+This is a learning project. Feel free to fork and experiment!
+
+## 📄 License
+
+MIT License - feel free to use this project for learning and development.
 
 ---
 
-## 📚 Documentation
-
-### Docker Configuration
-
-- `Dockerfile` - Production image definition
-- `Dockerfile.dev` - Development image
-- `docker-compose.yml` - Production orchestration
-- `docker-compose.dev.yml` - Development orchestration
-- `.dockerignore` - Exclude files from image
-
-### Nginx Configuration
-
-- `nginx.conf` - Reverse proxy rules
-- API requests proxied to backend
-- Client-side routing support
-- Static asset caching
-- Security headers
-
----
-
-## 🎉 Summary
-
-Your blogging platform now features:
-
-✅ **Professional MVC Architecture**  
-✅ **Medium-like UI Design**  
-✅ **Fully Dockerized**  
-✅ **Docker Compose Orchestration**  
-✅ **Development & Production Modes**  
-✅ **Health Checks Configured**  
-✅ **Nginx Reverse Proxy**  
-✅ **Volume Persistence**  
-✅ **Multi-stage Builds**  
-✅ **Production Ready**  
-
----
-
-## Quick Start Guide
-
-```bash
-# Method 1: Docker (Recommended)
-docker-compose up -d
-
-# Method 2: Local Development
-npm run install:all
-npm run seed
-# Terminal 1: cd backend && npm run dev
-# Terminal 2: cd frontend && npm start
-```
-
-**Access Application:**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-
----
-
-**Built with ❤️ using React.js, Node.js (MVC), Express, SQLite, and Docker**
-
-**Happy Coding! 🚀**
+**Built with ❤️ using React.js and Node.js**

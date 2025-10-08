@@ -134,9 +134,17 @@ export default function Header({ onMenuClick, onSearch }) {
               <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
                 <div className="px-4 py-3 border-b border-gray-200">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-12 h-12 rounded-full ${getAvatarBg(user?.name || 'User')} flex items-center justify-center text-white font-semibold`}>
-                      {getUserInitials(user?.name || 'User')}
-                    </div>
+                    {user?.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt="User Avatar" 
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-12 h-12 rounded-full ${getAvatarBg(user?.name || 'User')} flex items-center justify-center text-white font-semibold`}>
+                        {getUserInitials(user?.name || 'User')}
+                      </div>
+                    )}
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
                       <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
@@ -158,11 +166,11 @@ export default function Header({ onMenuClick, onSearch }) {
                   Stories
                 </Link>
                 
-                <Link to="/library" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Link to="/bookmarks" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                   </svg>
-                  Library
+                  Bookmarks
                 </Link>
                 
                 <Link to="/stats" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">

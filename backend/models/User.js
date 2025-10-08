@@ -79,10 +79,11 @@ class User {
 
     db.run(`
       UPDATE users
-      SET name = ?, avatar = ?, bio = ?, password = ?, updated_at = ?
+      SET name = ?, email = ?, avatar = ?, bio = ?, password = ?, updated_at = ?
       WHERE id = ?
     `, [
       data.name ?? existingUser.name,
+      data.email ?? existingUser.email,
       data.avatar ?? existingUser.avatar,
       data.bio ?? existingUser.bio,
       password,

@@ -26,6 +26,21 @@ export default function EditPost() {
     fetchPost();
   }, [id, user, navigate]);
 
+  // Helper function to strip HTML and get plain text
+  const stripHtmlAndImages = (html) => {
+    if (!html) return '';
+    // Create a temporary div to parse HTML
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    // Remove all img tags
+    const images = temp.getElementsByTagName('img');
+    while (images.length > 0) {
+      images[0].parentNode.removeChild(images[0]);
+    }
+    // Get text content only
+    return temp.textContent || temp.innerText || '';
+  };
+
   const fetchPost = async () => {
     try {
       const response = await getPostById(id);
@@ -40,7 +55,9 @@ export default function EditPost() {
 
       setTitle(post.title);
       setContent(post.content);
-      setExcerpt(post.excerpt || '');
+      // Strip HTML and images from excerpt
+      const cleanExcerpt = stripHtmlAndImages(post.excerpt || post.content);
+      setExcerpt(cleanExcerpt.substring(0, 200));
       setCategory(post.category || '');
       setTags(post.tags ? post.tags.join(', ') : '');
       setCoverImage(post.coverImage || '');
@@ -80,10 +97,16 @@ export default function EditPost() {
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0);
 
+      // Generate clean excerpt if not provided
+      let cleanExcerpt = excerpt;
+      if (!cleanExcerpt || cleanExcerpt.trim() === '') {
+        cleanExcerpt = stripHtmlAndImages(content).substring(0, 160) + '...';
+      }
+
       const postData = {
         title,
         content,
-        excerpt: excerpt || content.substring(0, 160).replace(/<[^>]*>/g, '') + '...',
+        excerpt: cleanExcerpt,
         category: category || 'Uncategorized',
         tags: tagsArray,
         coverImage: coverImage || '',

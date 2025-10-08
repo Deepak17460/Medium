@@ -8,8 +8,10 @@ import Home from './pages/Home';
 import ViewPost from './pages/ViewPost';
 import CreatePost from './pages/CreatePost';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 import Followers from './pages/Followers';
 import Following from './pages/Following';
+import Bookmarks from './pages/Bookmarks';
 
 function App() {
   return (
@@ -22,7 +24,9 @@ function App() {
           <Route path="/create" element={<CreatePost />} />
           <Route path="/stories" element={<Stories />} />
           <Route path="/edit/:id" element={<EditPost />} />
+          <Route path="/bookmarks" element={<Bookmarks />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/profile/:userId/followers" element={<Followers />} />
           <Route path="/profile/:userId/following" element={<Following />} />

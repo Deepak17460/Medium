@@ -1,8 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { format, parseISO, isValid } from 'date-fns';
+import { bookmarkPost, removeBookmark, checkBookmark, featurePost, unfeaturePost, checkFeatured } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function BlogCard({ post }) {
+  const { isAuthenticated } = useAuth();
+  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarking, setBookmarking] = useState(false);
+  const [featured, setFeatured] = useState(post.featured || false);
+  const [featuring, setFeaturing] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && post.id) {
+      checkIfBookmarked();
+      checkIfFeatured();
+    }
+  }, [post.id, isAuthenticated]);
+
+  const checkIfBookmarked = async () => {
+    try {
+      const response = await checkBookmark(post.id);
+      setBookmarked(response.data.data.isBookmarked);
+    } catch (error) {
+      console.error('Error checking bookmark:', error);
+    }
+  };
+
+  const handleBookmark = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isAuthenticated || bookmarking) return;
+    
+    try {
+      setBookmarking(true);
+      if (bookmarked) {
+        await removeBookmark(post.id);
+        setBookmarked(false);
+      } else {
+        await bookmarkPost(post.id);
+        setBookmarked(true);
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+    } finally {
+      setBookmarking(false);
+    }
+  };
+
+  const checkIfFeatured = async () => {
+    try {
+      const response = await checkFeatured(post.id);
+      setFeatured(response.data.data.isFeatured);
+    } catch (error) {
+      console.error('Error checking featured:', error);
+    }
+  };
+
+  const handleFeature = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isAuthenticated || featuring) return;
+    
+    try {
+      setFeaturing(true);
+      if (featured) {
+        await unfeaturePost(post.id);
+        setFeatured(false);
+      } else {
+        await featurePost(post.id);
+        setFeatured(true);
+      }
+    } catch (error) {
+      console.error('Error toggling featured:', error);
+    } finally {
+      setFeaturing(false);
+    }
+  };
+
   // Format date as "5 Oct 2024"
   const formatDate = (dateString) => {
     if (!dateString) return 'Recent';
@@ -33,11 +110,19 @@ export default function BlogCard({ post }) {
           {/* Author */}
           <div className="flex items-center space-x-2 mb-3">
             <Link to={`/profile/${post.userId}`} className="flex items-center space-x-2 hover:opacity-80">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-semibold">
-                  {post.author.charAt(0).toUpperCase()}
-                </span>
-              </div>
+              {post.authorAvatar ? (
+                <img
+                  src={post.authorAvatar}
+                  alt={post.author}
+                  className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                />
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-[10px] font-semibold">
+                    {post.author.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
               <span className="text-[13px] text-gray-900 font-medium">{post.author}</span>
             </Link>
           </div>
@@ -57,10 +142,21 @@ export default function BlogCard({ post }) {
           {/* Meta */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 text-[13px] text-gray-600">
-              {/* Star for featured/member-only */}
-              <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
+              {/* Star for featured */}
+              <button
+                onClick={handleFeature}
+                disabled={!isAuthenticated || featuring}
+                className={`transition-colors ${
+                  featured 
+                    ? 'text-yellow-500' 
+                    : 'text-gray-400 hover:text-yellow-500'
+                } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                title={featured ? 'Unfeature post' : 'Feature post'}
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </button>
 
               <span>{formatDate(post.createdAt)}</span>
               
@@ -87,8 +183,22 @@ export default function BlogCard({ post }) {
             {/* Actions */}
             <div className="flex items-center space-x-2">
               {/* Bookmark */}
-              <button className="p-1 text-gray-500 hover:text-gray-900">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button 
+                onClick={handleBookmark}
+                disabled={!isAuthenticated || bookmarking}
+                className={`p-1 transition-colors ${
+                  bookmarked 
+                    ? 'text-gray-900' 
+                    : 'text-gray-500 hover:text-gray-900'
+                } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={bookmarked ? 'Remove bookmark' : 'Bookmark post'}
+              >
+                <svg 
+                  className="w-5 h-5" 
+                  fill={bookmarked ? 'currentColor' : 'none'} 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
               </button>

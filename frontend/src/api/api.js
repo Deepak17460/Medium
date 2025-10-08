@@ -66,4 +66,10 @@ export const removeBookmark = (postId) => api.delete(`/posts/${postId}/bookmark`
 export const getUserBookmarks = () => api.get(`/posts/bookmarks`);
 export const checkBookmark = (postId) => api.get(`/posts/${postId}/bookmark/check`);
 
+// Feature API
+export const featurePost = (postId) => api.post(`/posts/${postId}/featured`);
+export const unfeaturePost = (postId) => api.delete(`/posts/${postId}/featured`);
+export const getFeaturedPosts = () => api.get(`/posts/featured`);
+export const checkFeatured = (postId) => api.get(`/posts/${postId}/featured/check`);
+
 export default api;

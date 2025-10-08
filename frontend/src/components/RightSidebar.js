@@ -76,9 +76,17 @@ export default function RightSidebar() {
             {staffPicks.map((post, idx) => (
               <Link key={post.id} to={`/post/${post.slug}`} className="block group">
                 <div className="flex items-start space-x-3">
-                  <div className={`flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br ${getAvatarColor(idx)} flex items-center justify-center text-white text-xs font-semibold`}>
-                    {post.author.charAt(0).toUpperCase()}
-                  </div>
+                  {post.authorAvatar ? (
+                    <img
+                      src={post.authorAvatar}
+                      alt={post.author}
+                      className="flex-shrink-0 w-5 h-5 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className={`flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br ${getAvatarColor(idx)} flex items-center justify-center text-white text-xs font-semibold`}>
+                      {post.author.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center text-xs text-gray-600 mb-1">
                       <span className="font-medium">{post.author}</span>
@@ -107,27 +115,19 @@ export default function RightSidebar() {
         )}
       </div>
 
-      {/* Writing on Medium */}
-      <div className="bg-blue-50 rounded-lg p-5 mb-8">
+      {/* Start Writing */}
+      <div className="bg-gray-50 rounded-lg p-5 mb-8 border border-gray-200">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">
-          Writing on Medium
+          Start Writing
         </h3>
-        <ul className="space-y-2 text-xs text-gray-600">
-          <li>
-            <a href="#" className="hover:text-gray-900">Join our Medium Writing 101 Webinar</a>
-          </li>
-          <li>
-            <a href="#" className="hover:text-gray-900">Read Medium tips & tricks</a>
-          </li>
-          <li>
-            <a href="#" className="hover:text-gray-900">Get practical Medium writing advice</a>
-          </li>
-        </ul>
+        <p className="text-xs text-gray-600 mb-4">
+          Share your stories and ideas with our community. Create engaging content and connect with readers worldwide.
+        </p>
         <Link 
           to="/create"
-          className="mt-4 px-4 py-2 bg-gray-900 text-white text-xs rounded-full hover:bg-gray-800 inline-block"
+          className="px-4 py-2 bg-gray-900 text-white text-xs rounded-full hover:bg-gray-800 inline-block transition-colors"
         >
-          Start writing
+          Write a story
         </Link>
       </div>
 

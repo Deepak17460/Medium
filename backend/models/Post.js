@@ -57,8 +57,24 @@ class Post {
     return result[0].values.map(row => row[0]);
   }
 
+  // Get user avatar by user ID
+  static getUserAvatar(userId) {
+    if (!userId) return null;
+    const db = getDB();
+    try {
+      const result = db.exec('SELECT avatar FROM users WHERE id = ?', [userId]);
+      if (result.length > 0 && result[0].values.length > 0) {
+        return result[0].values[0][0];
+      }
+    } catch (error) {
+      console.warn(`Error fetching user avatar for ${userId}:`, error);
+    }
+    return null;
+  }
+
   // Convert database row to Post object
   static rowToPost(row) {
+    const userId = row[6];
     return {
       id: row[0],           // id
       slug: row[1],         // slug
@@ -66,12 +82,14 @@ class Post {
       content: row[3],      // content
       excerpt: row[4] || '', // excerpt
       author: row[5],       // author
-      userId: row[6],       // user_id
+      userId: userId,       // user_id
+      authorAvatar: Post.getUserAvatar(userId), // user avatar
       category: row[7] || '', // category
       coverImage: row[8] || '', // cover_image
       createdAt: row[9],    // created_at
       updatedAt: row[10],   // updated_at
       readTime: row[11],    // read_time
+      featured: row[12] === 1 || row[12] === '1', // featured (convert to boolean)
       tags: Post.getPostTags(row[0]),
     };
   }
@@ -282,6 +300,40 @@ class Post {
       name: row[0],
       postCount: row[1]
     }));
+  }
+
+  // Feature a post
+  static featurePost(postId) {
+    const db = getDB();
+    db.run('UPDATE posts SET featured = 1 WHERE id = ?', [postId]);
+    saveDatabase();
+    return Post.findById(postId);
+  }
+
+  // Unfeature a post
+  static unfeaturePost(postId) {
+    const db = getDB();
+    db.run('UPDATE posts SET featured = 0 WHERE id = ?', [postId]);
+    saveDatabase();
+    return Post.findById(postId);
+  }
+
+  // Get all featured posts
+  static getFeaturedPosts() {
+    const db = getDB();
+    const result = db.exec('SELECT * FROM posts WHERE featured = 1 ORDER BY created_at DESC');
+    
+    if (result.length === 0) return [];
+    return result[0].values.map(Post.rowToPost);
+  }
+
+  // Check if post is featured
+  static isFeatured(postId) {
+    const db = getDB();
+    const result = db.exec('SELECT featured FROM posts WHERE id = ?', [postId]);
+    
+    if (result.length === 0 || result[0].values.length === 0) return false;
+    return result[0].values[0][0] === 1 || result[0].values[0][0] === '1';
   }
 }
 

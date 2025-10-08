@@ -38,7 +38,7 @@ async function initializeDatabase() {
     
     db.run(`CREATE INDEX IF NOT EXISTS idx_user_email ON users(email);`);
     
-    // Create posts table (updated with user_id)
+    // Create posts table (updated with user_id and featured)
     db.run(`
       CREATE TABLE IF NOT EXISTS posts (
         id TEXT PRIMARY KEY,
@@ -53,9 +53,17 @@ async function initializeDatabase() {
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         read_time INTEGER NOT NULL,
+        featured INTEGER DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
       );
     `);
+    
+    // Add featured column if it doesn't exist (for existing databases)
+    try {
+      db.run(`ALTER TABLE posts ADD COLUMN featured INTEGER DEFAULT 0;`);
+    } catch (e) {
+      // Column already exists, ignore error
+    }
     
     db.run(`CREATE INDEX IF NOT EXISTS idx_slug ON posts(slug);`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_category ON posts(category);`);

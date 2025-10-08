@@ -20,8 +20,8 @@ export default function Sidebar({ isOpen }) {
   };
 
   const navItems = [
-    { icon: 'home', label: 'Home', path: '/' },
-    { icon: 'bookmark', label: 'Library', path: '/library' },
+    { icon: 'home', label: 'Home', path: '/home' },
+    { icon: 'bookmark', label: 'Bookmarks', path: '/bookmarks' },
     { icon: 'user', label: 'Profile', path: '/profile' },
     { icon: 'file', label: 'Stories', path: '/stories' },
     { icon: 'chart', label: 'Stats', path: '/stats' },

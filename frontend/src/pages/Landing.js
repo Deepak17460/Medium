@@ -1,20 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthModal from '../components/AuthModal';
+import { getAllPosts } from '../api/api';
+import { format, parseISO, isValid } from 'date-fns';
 
 const Landing = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('signin'); // 'signin' or 'signup'
+  const [trendingPosts, setTrendingPosts] = useState([]);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  // Fetch trending posts
+  useEffect(() => {
+    fetchTrendingPosts();
+  }, []);
+
   // If authenticated, redirect to home
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
       navigate('/home');
     }
   }, [isAuthenticated, navigate]);
+
+  const fetchTrendingPosts = async () => {
+    try {
+      const response = await getAllPosts();
+      const posts = response.data.data || [];
+      // Get top 6 posts sorted by likes
+      const sorted = [...posts].sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
+      setTrendingPosts(sorted.slice(0, 6));
+    } catch (error) {
+      console.error('Error fetching trending posts:', error);
+      setTrendingPosts([]);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Recently';
+    try {
+      const date = parseISO(dateString);
+      if (isValid(date)) {
+        return format(date, 'd MMM');
+      }
+      const fallbackDate = new Date(dateString);
+      if (!isNaN(fallbackDate.getTime())) {
+        return format(fallbackDate, 'd MMM');
+      }
+      return 'Recently';
+    } catch (error) {
+      return 'Recently';
+    }
+  };
 
   const openSignIn = () => {
     setAuthMode('signin');
@@ -128,25 +166,49 @@ const Landing = () => {
 
           {/* Trending Posts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
-              <div key={num} className="flex">
-                <span className="text-[32px] font-bold text-gray-200 mr-4">
-                  0{num}
-                </span>
-                <div>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-5 h-5 rounded-full bg-gray-300"></div>
-                    <span className="text-xs font-medium text-gray-900">Author Name</span>
+            {trendingPosts.length > 0 ? (
+              trendingPosts.map((post, index) => (
+                <div key={post.id} className="flex">
+                  <span className="text-[32px] font-bold text-gray-200 mr-4">
+                    0{index + 1}
+                  </span>
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      {post.authorAvatar ? (
+                        <img
+                          src={post.authorAvatar}
+                          alt={post.author}
+                          className="w-5 h-5 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                          <span className="text-white text-[10px] font-semibold">
+                            {post.author?.charAt(0).toUpperCase() || 'A'}
+                          </span>
+                        </div>
+                      )}
+                      <span className="text-xs font-medium text-gray-900">{post.author || 'Anonymous'}</span>
+                    </div>
+                    <button
+                      onClick={openSignUp}
+                      className="text-left"
+                    >
+                      <h3 className="text-base font-bold text-gray-900 mb-2 leading-tight hover:underline">
+                        {post.title}
+                      </h3>
+                    </button>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(post.createdAt)} · {post.readTime || 5} min read
+                      {post.likeCount > 0 && <span className="ml-1">· {post.likeCount} ❤️</span>}
+                    </p>
                   </div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2 leading-tight hover:underline cursor-pointer">
-                    How to Build a Successful Tech Career in 2024
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    Oct 8 · 5 min read · <span className="text-gray-400">⭐</span>
-                  </p>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-8 text-gray-500">
+                <p>No posts available yet. Be the first to write!</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>

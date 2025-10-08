@@ -101,16 +101,6 @@ export default function Home() {
           }`}
         >
           <div className="max-w-[728px] mx-auto">
-            {/* Notice Banner */}
-            <div className="border-b border-gray-200 px-6 py-4 bg-yellow-50 flex items-start justify-between">
-              <p className="text-sm text-gray-700 flex-1">
-                "Following" and your topics are now part of the new Following page, which you can find from the sidebar.
-              </p>
-              <button className="text-sm text-gray-600 hover:text-gray-900 ml-4 underline">
-                Okay, got it
-              </button>
-            </div>
-
             {/* Tabs */}
             <div className="border-b border-gray-200 sticky top-[57px] bg-white z-10">
               <div className="flex space-x-8 px-6">

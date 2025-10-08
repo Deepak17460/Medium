@@ -44,6 +44,19 @@ export default function CreatePost() {
     'code-block',
   ];
 
+  // Helper function to strip HTML and get plain text
+  const stripHtmlAndImages = (html) => {
+    if (!html) return '';
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    // Remove all img tags
+    const images = temp.getElementsByTagName('img');
+    while (images.length > 0) {
+      images[0].parentNode.removeChild(images[0]);
+    }
+    return temp.textContent || temp.innerText || '';
+  };
+
   const handlePublish = async () => {
     if (!formData.title || !formData.content) {
       alert('Please add a title and content to your story');
@@ -57,8 +70,19 @@ export default function CreatePost() {
 
     try {
       setPublishing(true);
+      
+      // Clean excerpt - strip HTML and images, limit length
+      let cleanExcerpt = formData.excerpt;
+      if (cleanExcerpt) {
+        cleanExcerpt = stripHtmlAndImages(cleanExcerpt).substring(0, 200);
+      } else {
+        // Auto-generate from content if not provided
+        cleanExcerpt = stripHtmlAndImages(formData.content).substring(0, 160) + '...';
+      }
+      
       const postData = {
         ...formData,
+        excerpt: cleanExcerpt,
         tags: formData.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag),
       };
 

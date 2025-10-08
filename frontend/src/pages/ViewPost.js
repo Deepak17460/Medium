@@ -235,9 +235,17 @@ export default function ViewPost() {
           {/* Author Info */}
           <div className="flex items-center mb-8 pb-8 border-b border-gray-200">
             <Link to={`/profile/${post.userId}`} className="flex items-center hover:opacity-80">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold mr-3">
-                {post.author?.charAt(0) || 'A'}
-              </div>
+              {post.authorAvatar ? (
+                <img
+                  src={post.authorAvatar}
+                  alt={post.author}
+                  className="w-12 h-12 rounded-full object-cover mr-3"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold mr-3">
+                  {post.author?.charAt(0) || 'A'}
+                </div>
+              )}
               <div>
                 <div className="text-sm font-semibold text-gray-900 hover:underline">
                   {post.author || 'Anonymous'}
