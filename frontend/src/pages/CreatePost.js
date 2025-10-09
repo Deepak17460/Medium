@@ -1,11 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.bubble.css';
 import { createPost } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function CreatePost() {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -43,6 +45,16 @@ export default function CreatePost() {
     'image',
     'code-block',
   ];
+
+  // Pre-fill author name with logged-in user's name
+  useEffect(() => {
+    if (user?.name && !formData.author) {
+      setFormData(prev => ({
+        ...prev,
+        author: user.name
+      }));
+    }
+  }, [user, formData.author]);
 
   // Helper function to strip HTML and get plain text
   const stripHtmlAndImages = (html) => {
@@ -281,14 +293,14 @@ export default function CreatePost() {
           {/* Left: Logo and Draft Status */}
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/home')}
               className="text-[32px] font-bold tracking-tight hover:opacity-80 transition-opacity"
               style={{ fontFamily: 'Spectral, Georgia, serif' }}
             >
               Medium
             </button>
             <span className="text-sm text-gray-500">
-              Draft in {formData.author || 'Your Name'}
+              Draft in {user?.name || 'Your Name'}
             </span>
           </div>
 
@@ -311,9 +323,23 @@ export default function CreatePost() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
             </button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-semibold cursor-pointer hover:ring-2 hover:ring-gray-300 transition-all">
-              {formData.author ? formData.author.charAt(0).toUpperCase() : 'U'}
-            </div>
+            {/* User Avatar */}
+            <button
+              onClick={() => navigate('/profile')}
+              className="cursor-pointer hover:ring-2 hover:ring-gray-300 transition-all rounded-full"
+            >
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-semibold">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+              )}
+            </button>
           </div>
         </div>
       </header>

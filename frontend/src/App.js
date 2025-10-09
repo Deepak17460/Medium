@@ -12,6 +12,7 @@ import EditProfile from './pages/EditProfile';
 import Followers from './pages/Followers';
 import Following from './pages/Following';
 import Bookmarks from './pages/Bookmarks';
+import Stats from './pages/Stats';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/post/:slug" element={<ViewPost />} />
           <Route path="/create" element={<CreatePost />} />
           <Route path="/stories" element={<Stories />} />
+          <Route path="/stats" element={<Stats />} />
           <Route path="/edit/:id" element={<EditPost />} />
           <Route path="/bookmarks" element={<Bookmarks />} />
           <Route path="/profile" element={<Profile />} />

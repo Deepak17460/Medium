@@ -7,11 +7,14 @@ import Sidebar from '../components/Sidebar';
 import BlogCard from '../components/BlogCard';
 
 export default function Bookmarks() {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
   const navigate = useNavigate();
   const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  console.log('Bookmarks - Current user:', user);
+  console.log('Bookmarks - Is authenticated:', isAuthenticated);
 
   // Redirect to landing if not authenticated
   useEffect(() => {
@@ -30,10 +33,15 @@ export default function Bookmarks() {
     try {
       setLoading(true);
       const response = await getUserBookmarks();
+      console.log('Bookmarks API Response:', response);
+      console.log('Bookmarks data:', response.data);
+      console.log('Bookmarks array:', response.data.data);
       const bookmarks = response.data.data || [];
+      console.log('Final bookmarks:', bookmarks);
       setBookmarkedPosts(bookmarks);
     } catch (error) {
       console.error('Error fetching bookmarks:', error);
+      console.error('Error details:', error.response?.data);
       setBookmarkedPosts([]);
     } finally {
       setLoading(false);

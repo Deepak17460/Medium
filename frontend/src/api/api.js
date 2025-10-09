@@ -72,4 +72,13 @@ export const unfeaturePost = (postId) => api.delete(`/posts/${postId}/featured`)
 export const getFeaturedPosts = () => api.get(`/posts/featured`);
 export const checkFeatured = (postId) => api.get(`/posts/${postId}/featured/check`);
 
+// Stats API
+export const recordView = (postId) => api.post(`/posts/${postId}/view`);
+export const recordRead = (postId) => api.post(`/posts/${postId}/read`);
+export const getPostStats = (postId) => api.get(`/posts/${postId}/stats`);
+export const getUserStats = (userId) => api.get(`/users/${userId}/stats`);
+export const getUserPostStats = (userId) => api.get(`/users/${userId}/stats/posts`);
+export const getUserStatsByDateRange = (userId, startDate, endDate) => 
+  api.get(`/users/${userId}/stats/range?startDate=${startDate}&endDate=${endDate}`);
+
 export default api;

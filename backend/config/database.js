@@ -157,6 +157,36 @@ async function initializeDatabase() {
     db.run(`CREATE INDEX IF NOT EXISTS idx_bookmarks_user ON bookmarks(user_id);`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_bookmarks_post ON bookmarks(post_id);`);
     
+    // Create post_views table (for analytics)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS post_views (
+        id TEXT PRIMARY KEY,
+        post_id TEXT NOT NULL,
+        user_id TEXT,
+        viewed_at TEXT NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_views_post ON post_views(post_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_views_date ON post_views(viewed_at);`);
+    
+    // Create post_reads table (for analytics)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS post_reads (
+        id TEXT PRIMARY KEY,
+        post_id TEXT NOT NULL,
+        user_id TEXT,
+        read_at TEXT NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      );
+    `);
+    
+    db.run(`CREATE INDEX IF NOT EXISTS idx_reads_post ON post_reads(post_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_reads_date ON post_reads(read_at);`);
+    
     // Save database to disk
     saveDatabase();
     

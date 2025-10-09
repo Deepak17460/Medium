@@ -10,6 +10,8 @@ const commentRoutes = require('./commentRoutes');
 const userRoutes = require('./userRoutes');
 const bookmarkRoutes = require('./bookmarkRoutes');
 const featureRoutes = require('./featureRoutes');
+const statsRoutes = require('./statsRoutes');
+const userStatsRoutes = require('./userStatsRoutes');
 
 // Health check
 router.get('/health', (req, res) => {
@@ -27,7 +29,9 @@ router.use('/posts', likeRoutes); // Like routes under /posts
 router.use('/posts', commentRoutes); // Comment routes under /posts
 router.use('/posts', bookmarkRoutes); // Bookmark routes under /posts
 router.use('/posts', featureRoutes); // Feature routes under /posts
+router.use('/posts', statsRoutes); // Stats routes under /posts
 router.use('/users', userRoutes); // User and follow routes
+router.use('/users', userStatsRoutes); // User stats routes under /users
 router.use('/', categoryRoutes);
 
 module.exports = router;

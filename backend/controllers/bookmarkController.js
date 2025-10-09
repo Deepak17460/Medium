@@ -46,13 +46,16 @@ exports.removeBookmark = (req, res, next) => {
 };
 
 // @desc    Get user's bookmarks
-// @route   GET /api/bookmarks
+// @route   GET /api/posts/bookmarks
 // @access  Private
 exports.getUserBookmarks = (req, res, next) => {
   try {
     const userId = req.user.id;
+    console.log('Fetching bookmarks for user:', userId);
 
     const bookmarks = Bookmark.getUserBookmarks(userId);
+    console.log('Found bookmarks:', bookmarks.length);
+    console.log('Bookmarks data:', JSON.stringify(bookmarks, null, 2));
 
     res.json({
       success: true,
@@ -60,6 +63,7 @@ exports.getUserBookmarks = (req, res, next) => {
       data: bookmarks,
     });
   } catch (error) {
+    console.error('Error in getUserBookmarks controller:', error);
     next(error);
   }
 };

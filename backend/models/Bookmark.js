@@ -40,11 +40,24 @@ class Bookmark {
     return result[0].values[0][0] > 0;
   }
 
-  // Get user's bookmarks
+  // Get user's bookmarks with full post details
   static getUserBookmarks(userId) {
     const db = getDB();
     const result = db.exec(`
-      SELECT b.id, b.post_id, b.created_at, p.title, p.excerpt, p.author, p.cover_image, p.slug
+      SELECT 
+        p.id,
+        p.slug,
+        p.title,
+        p.content,
+        p.excerpt,
+        p.author,
+        p.user_id,
+        p.category,
+        p.cover_image,
+        p.created_at,
+        p.updated_at,
+        p.read_time,
+        p.featured
       FROM bookmarks b
       JOIN posts p ON b.post_id = p.id
       WHERE b.user_id = ?
@@ -52,19 +65,34 @@ class Bookmark {
     `, [userId]);
 
     if (result.length === 0) return [];
-    return result[0].values.map(row => ({
-      id: row[0],
-      postId: row[1],
-      createdAt: row[2],
-      post: {
-        id: row[1],
-        title: row[3],
-        excerpt: row[4],
+    
+    // Import Post and Like/Comment models for counts
+    const Post = require('./Post');
+    const Like = require('./Like');
+    const Comment = require('./Comment');
+    
+    return result[0].values.map(row => {
+      const postId = row[0];
+      return {
+        id: postId,
+        slug: row[1],
+        title: row[2],
+        content: row[3],
+        excerpt: row[4] || '',
         author: row[5],
-        coverImage: row[6],
-        slug: row[7]
-      }
-    }));
+        userId: row[6],
+        authorAvatar: Post.getUserAvatar(row[6]),
+        category: row[7] || '',
+        coverImage: row[8] || '',
+        createdAt: row[9],
+        updatedAt: row[10],
+        readTime: row[11],
+        featured: row[12] === 1 || row[12] === '1',
+        tags: Post.getPostTags(postId),
+        likeCount: Like.getPostLikesCount(postId),
+        commentCount: Comment.getPostCommentsCount(postId),
+      };
+    });
   }
 
   // Get bookmark count for a post

@@ -10,9 +10,12 @@ import {
   createComment,
   getPostComments,
   deleteComment,
+  deletePost,
   bookmarkPost,
   removeBookmark,
   checkBookmark,
+  recordView,
+  recordRead,
 } from '../api/api';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
@@ -54,6 +57,14 @@ export default function ViewPost() {
       setPost(postData);
       
       if (postData) {
+        // Record view immediately
+        recordView(postData.id).catch(err => console.error('Error recording view:', err));
+        
+        // Record read after 30 seconds (if user is still reading)
+        setTimeout(() => {
+          recordRead(postData.id).catch(err => console.error('Error recording read:', err));
+        }, 30000); // 30 seconds
+        
         fetchLikes(postData.id);
         fetchComments(postData.id);
         checkIfBookmarked(postData.id);
@@ -139,6 +150,23 @@ export default function ViewPost() {
       console.error('Error deleting comment:', error);
       alert('Failed to delete comment');
     }
+  };
+
+  const handleDeletePost = async () => {
+    if (!window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) return;
+    
+    try {
+      await deletePost(post.id);
+      alert('Post deleted successfully');
+      navigate('/stories');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      alert('Failed to delete post');
+    }
+  };
+
+  const handleEditPost = () => {
+    navigate(`/edit/${post.id}`);
   };
 
   const checkIfBookmarked = async (postId) => {
@@ -298,6 +326,32 @@ export default function ViewPost() {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Edit and Delete buttons - only for post author */}
+              {user && post.userId === user.id && (
+                <>
+                  <button
+                    onClick={handleEditPost}
+                    className="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-full transition"
+                    title="Edit post"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={handleDeletePost}
+                    className="flex items-center space-x-1 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-full transition"
+                    title="Delete post"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>Delete</span>
+                  </button>
+                </>
+              )}
+              
               <button
                 onClick={handleBookmark}
                 className="p-2 hover:bg-gray-100 rounded-full transition"
